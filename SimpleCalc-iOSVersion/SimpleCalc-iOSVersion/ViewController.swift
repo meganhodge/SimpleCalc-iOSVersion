@@ -74,6 +74,8 @@ class ViewController: UIViewController {
                     case "Avg":
                         let sum : Double = arrayForRPN.reduce(0, combine: +)
                         self.display.text = String(sum / Double(arrayForRPN.count))
+                    // displays the number of numbers in the array
+                    // works for user input 0 = 4 = 5 = 6 Count which displays 4 because there were 4 numbers entered
                     case "Count":
                         self.display.text = String(arrayForRPN.count)
                     // this will take the first number in the array because we are only using one number for factorial so it will ignore any other user input
