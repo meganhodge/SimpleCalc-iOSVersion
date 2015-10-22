@@ -30,6 +30,12 @@ class ViewController: UIViewController {
     // keeps track of the number of numbers entered for the average function
     var countA : Int = 1
     
+    var traditional : Bool = true
+    
+    var arrayForRPN : [Double] = []
+    
+    var totalForRPN : Double = 0.0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -41,79 +47,102 @@ class ViewController: UIViewController {
     }
 
     @IBAction func hasBeenClicked(sender: UIButton) {
-        if sender.titleLabel!.text! != "=" && sender.titleLabel!.text! != "Avg" {
-            clearForNext = true
-            calcInputStored = Double(self.display.text!)!
-        }
-        
-        switch sender.titleLabel!.text! {
-            // only one number for calculation ex. 3 Fact => 6
-            case "Fact" :
-                operationInput = "Fact"
-                self.display.text = String(fact(calcInputStored))
-            // will follow pattern ex. # Avg # Avg # =  => (displays average of those three numbers)
-            case "Avg" :
-                operationInput = "Avg"
+        if !traditional {
+            // collects numbers until an operator is pressed
+            arrayForRPN.append(Double(self.display.text!)!)
+            if sender.titleLabel!.text! == "=" {
                 clearForNext = true
-                // adds the numbers entered to collect the sum
-                calcInputStored += Double(self.display.text!)!
-                countA++
-            
-            case "Count" : // input for calculation follows pattern # Count # Count # = => 3 for example
-                operationInput = "Count"
-                countC++
-            
-            // for add, subtract, multiply, divide, and mod we are assuming the user will click in # then (+, 0, x, /, %) then # then = and we will show the result, they can then click another operation (+, 0, x, /, %) and then # and then = and it will do the operation using the last calculation's result and the new number and operation
-            case "/" :
-                operationInput = "/"
-            
-            case "x" :
-                operationInput = "x"
-            
-            case "-" :
-                operationInput = "-"
-
-            case "+" :
-                operationInput = "+"
-            
-            case "%" :
-                operationInput = "%"
-            
-            case "=" :
-                // stores the displayed number
-                //let calcInput = Double(self.display.text!)!
-                calcInput = Double(self.display.text!)!
-                // variable to keep track of the overall calculation
-                var displayCalculation : Double = 0
-                // since Fact takes one number it is calculated above
-                switch operationInput {
-                    case "Avg" :
-                        displayCalculation = (calcInput + calcInputStored) / Double(countA)
-                    case "Count" :
-                        displayCalculation = Double(countC + 1)
-                    case "/" :
-                        displayCalculation = calcInputStored / calcInput
-                    case "x" :
-                        displayCalculation = calcInputStored * calcInput
-                    case "-" :
-                        displayCalculation = calcInputStored - calcInput
-                    case "+" :
-                        displayCalculation = calcInputStored + calcInput
-                    case "%" :
-                        displayCalculation = calcInputStored % calcInput
-                    default :
-                        break
+            } else {
+                switch sender.titleLabel!.text! {
+                    case "+":
+                        self.display.text = String(arrayForRPN.reduce(0, combine: +))
+                    case "-":
+                        self.display.text = String(arrayForRPN.reduce(0, combine: -))
+                    case "x":
+                        self.display.text = String(arrayForRPN.reduce(1, combine: *))
+                    case "/":
+                        self.display.text = String(arrayForRPN.reduce(1, combine: /))
+                    case "Clear":
+                        self.display.text = "0"
+                        clearForNext = false
+                    default : break
                 }
-                self.display.text! = String(displayCalculation)
-                clearForNext = true // will reset the display so that more numbers can be entered after the calculation is completed without adding numbers to the end of the calculated value
-                // still allows the user to click 3 + 1 = (shows 4) but if they click = again then it will continue to add 1 everytime they click = again so displays 5 then 6 etc.
-            
-            case "Clear" :
-                self.display.text = "0"
-                resetVariables() // if the user clicks clear then everything is reset to their original values
-            
-            default :
-                break
+                arrayForRPN.removeAll()
+                clearForNext = true
+            }
+        } else {
+            if sender.titleLabel!.text! != "=" && sender.titleLabel!.text! != "Avg" {
+                clearForNext = true
+                calcInputStored = Double(self.display.text!)!
+            }
+            switch sender.titleLabel!.text! {
+                // only one number for calculation ex. 3 Fact => 6
+                case "Fact" :
+                    operationInput = "Fact"
+                    self.display.text = String(fact(calcInputStored))
+                // will follow pattern ex. # Avg # Avg # =  => (displays average of those three numbers)
+                case "Avg" :
+                    operationInput = "Avg"
+                    clearForNext = true
+                    // adds the numbers entered to collect the sum
+                    calcInputStored += Double(self.display.text!)!
+                    countA++
+                
+                case "Count" : // input for calculation follows pattern # Count # Count # = => 3 for example
+                    operationInput = "Count"
+                    countC++
+                
+                // for add, subtract, multiply, divide, and mod we are assuming the user will click in # then (+, 0, x, /, %) then # then = and we will show the result, they can then click another operation (+, 0, x, /, %) and then # and then = and it will do the operation using the last calculation's result and the new number and operation
+                case "/" :
+                    operationInput = "/"
+                
+                case "x" :
+                    operationInput = "x"
+                
+                case "-" :
+                    operationInput = "-"
+
+                case "+" :
+                    operationInput = "+"
+                
+                case "%" :
+                    operationInput = "%"
+                
+                case "=" :
+                    // stores the displayed number
+                    //let calcInput = Double(self.display.text!)!
+                    calcInput = Double(self.display.text!)!
+                    // variable to keep track of the overall calculation
+                    var displayCalculation : Double = 0
+                    // since Fact takes one number it is calculated above
+                    switch operationInput {
+                        case "Avg" :
+                            displayCalculation = (calcInput + calcInputStored) / Double(countA)
+                        case "Count" :
+                            displayCalculation = Double(countC + 1)
+                        case "/" :
+                            displayCalculation = calcInputStored / calcInput
+                        case "x" :
+                            displayCalculation = calcInputStored * calcInput
+                        case "-" :
+                            displayCalculation = calcInputStored - calcInput
+                        case "+" :
+                            displayCalculation = calcInputStored + calcInput
+                        case "%" :
+                            displayCalculation = calcInputStored % calcInput
+                        default :
+                            break
+                    }
+                    self.display.text! = String(displayCalculation)
+                    clearForNext = true // will reset the display so that more numbers can be entered after the calculation is completed without adding numbers to the end of the calculated value
+                    // still allows the user to click 3 + 1 = (shows 4) but if they click = again then it will continue to add 1 everytime they click = again so displays 5 then 6 etc.
+                
+                case "Clear" :
+                    self.display.text = "0"
+                    resetVariables() // if the user clicks clear then everything is reset to their original values
+                default :
+                    break
+            }
         }
     }
     
@@ -161,6 +190,16 @@ class ViewController: UIViewController {
                 break
         }
     }
+    
+    // switches between traditional and RPN functionality
+    @IBAction func Toggle(sender: UISwitch) {
+        if !sender.on {
+            traditional = false
+        } else {
+            traditional = true
+        }
+    }
+    
     
     // resets the calculation input and operation input because everything should be clean/reset for a new calculation, variable reset is reset to false
     func resetVariables() -> Void {
