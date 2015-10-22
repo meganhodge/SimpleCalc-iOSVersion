@@ -47,6 +47,7 @@ class ViewController: UIViewController {
     }
 
     @IBAction func hasBeenClicked(sender: UIButton) {
+        // uses RPN version of the calculator
         if !traditional {
             // collects numbers until an operator is pressed
             arrayForRPN.append(Double(self.display.text!)!)
@@ -57,11 +58,19 @@ class ViewController: UIViewController {
                     case "+":
                         self.display.text = String(arrayForRPN.reduce(0, combine: +))
                     case "-":
-                        self.display.text = String(arrayForRPN.reduce(0, combine: -))
+                        var total = arrayForRPN[0]
+                        for each in 1...(arrayForRPN.count - 1) {
+                            total -= arrayForRPN[each]
+                        }
+                        self.display.text = String(total)
                     case "x":
                         self.display.text = String(arrayForRPN.reduce(1, combine: *))
                     case "/":
-                        self.display.text = String(arrayForRPN.reduce(1, combine: /))
+                        var total = arrayForRPN[0]
+                        for each in 1...(arrayForRPN.count - 1) {
+                            total /= arrayForRPN[each]
+                        }
+                        self.display.text = String(total)
                     case "Clear":
                         self.display.text = "0"
                         clearForNext = false
@@ -70,6 +79,7 @@ class ViewController: UIViewController {
                 arrayForRPN.removeAll()
                 clearForNext = true
             }
+        // uses the traditional version of the calculator
         } else {
             if sender.titleLabel!.text! != "=" && sender.titleLabel!.text! != "Avg" {
                 clearForNext = true
